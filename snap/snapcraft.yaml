@@ -1,0 +1,17 @@
+name: rz-g2l-ebk
+summary: Renesas RZ/G2L Evaluation Board
+description: |
+ Support files for booting RZ/G2L Evaluation Board
+
+version: 24-1
+type: gadget
+
+base: core24
+
+platforms:
+  arm64:
+    build-on: [amd64, arm64]
+    build-for: arm64
+
+confinement: strict
+grade: stable
