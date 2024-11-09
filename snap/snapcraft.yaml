@@ -15,3 +15,26 @@ platforms:
 
 confinement: strict
 grade: stable
+
+build-packages:
+  - arm-trusted-firmware-tools
+  - bison
+  - build-essential
+  - device-tree-compiler
+  - flex
+  - libgnutls28-dev
+  - libssl-dev
+  - libxml2-dev
+  - pkgconf
+  - python3
+  - python3-cryptography
+  - python3-pycryptodome
+  - python3-pyelftools
+  - wget
+  - zlib1g-dev
+  - on amd64:
+    - gcc-aarch64-linux-gnu
+    - uuid-dev:arm64
+  - on arm64:
+    - gcc
+    - uuid-dev
