@@ -16,6 +16,9 @@ platforms:
 confinement: strict
 grade: stable
 
+build-snaps:
+  - yq
+
 build-packages:
   - arm-trusted-firmware-tools
   - bison
