@@ -143,6 +143,18 @@ parts:
       install -D -m 0644 ${CRAFT_PART_BUILD}/fip_pmic.srec \
                          ${CRAFT_PART_INSTALL}/blobs/fip-${MACHINE}_pmic.srec
 
+  flash-writter:
+    plugin: nil
+    source: https://github.com/renesas-rz/rzg2_flash_writer.git
+    source-branch: rz_g2l
+    build-environment:
+      - MACHINE: "smarc-rzg2l"
+      - BOARD: "RZG2L_SMARC_PMIC"
+      - CROSS_COMPILE: "aarch64-linux-gnu-"
+    override-build: |
+      make BOARD=${BOARD} -j1
+      install -m 644 -D AArch64_output/*.mot ${CRAFT_PART_INSTALL}/blobs/Flash_Writer_SCIF_RZG2L_SMARC_DDR4_2GB.mot
+
   flash-script: # uuu flash script
     plugin: nil
     override-build: |
