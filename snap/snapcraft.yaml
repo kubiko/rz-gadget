@@ -16,6 +16,45 @@ platforms:
 confinement: strict
 grade: stable
 
+parts:
+  arm-trusted-firmware:
+    plugin: nil
+    source: https://github.com/renesas-rz/rzg_trusted-firmware-a.git
+    source-type: git
+    source-tag: v2.9/rz
+    source-depth: 1
+    build-environment:
+      - MACHINE: "smarc-rzg2l"
+      - PLAT: "g2l"
+      - BOARD: "smarc_2"
+      - BOARD_PMIC: "smarc_pmic_2"
+      - CROSS_COMPILE: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-"
+      - CC: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-gcc"
+    override-build: |
+      make \
+        PLAT=${PLAT} \
+        BOARD=${BOARD} \
+        BUILD_BASE=${CRAFT_PART_BUILD}/build \
+        bl2 \
+        bl31 \
+        -j$(nproc)
+
+      make clean
+      make \
+        PLAT=${PLAT} \
+        BOARD=${BOARD_PMIC} \
+        BUILD_BASE=${CRAFT_PART_BUILD}/build-pmic \
+        bl2 \
+        bl31 \
+        -j$(nproc)
+
+      install -D -m 0644 build/${PLAT}/release/bl2.bin ${CRAFT_PART_INSTALL}/blobs/bl2-${MACHINE}.bin
+      install -D -m 0644 build/${PLAT}/release/bl31.bin ${CRAFT_PART_INSTALL}/blobs/bl31-${MACHINE}.bin
+      install -D -m 0644 build-pmic/${PLAT}/release/bl2.bin ${CRAFT_PART_INSTALL}/blobs/bl2-${MACHINE}_pmic.bin
+      install -D -m 0644 build-pmic/${PLAT}/release/bl31.bin ${CRAFT_PART_INSTALL}/blobs/bl31-${MACHINE}_pmic.bin
+    prime:
+      - -*
+
 build-snaps:
   - yq
 
