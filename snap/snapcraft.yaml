@@ -59,6 +59,16 @@ parts:
     prime:
       - -*
 
+  optee-keys:
+    plugin: dump
+    source: https://git.launchpad.net/~ondrak/+git/dev-keys
+    source-type: git
+    source-branch: ta-keys
+    organize:
+      '*': ta-keys/
+    prime:
+      - -*
+
   pub-signing-key:
     plugin: dump
     source: https://git.launchpad.net/~ondrak/+git/dev-keys
