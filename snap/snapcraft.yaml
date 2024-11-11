@@ -46,6 +46,7 @@ parts:
         BUILD_BASE="${CRAFT_PART_BUILD}/build-pmic" \
         bl2 \
         bl31 \
+        SPD=opteed \
         -j${CRAFT_PARALLEL_BUILD_COUNT}
 
       install -D -m 0644 "${CRAFT_PART_BUILD}/build/${PLAT}/release/bl2.bin" \
@@ -246,6 +247,12 @@ parts:
           --srec-forceS3 \
           -I binary "${CRAFT_PART_BUILD}/bl2_bp_pmic.bin" \
           "${CRAFT_PART_BUILD}/bl2_bp_pmic.srec"
+
+      # add tee
+      fiptool update \
+          --align 16 \
+          --tos-fw "${CRAFT_STAGE}/blobs/tee-${MACHINE}.bin" \
+          "${CRAFT_PART_BUILD}/fip_pmic.bin"
 
       objcopy \
           -I binary \
