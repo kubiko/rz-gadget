@@ -46,6 +46,7 @@ parts:
         BUILD_BASE=${CRAFT_PART_BUILD}/build-pmic \
         bl2 \
         bl31 \
+        SPD=opteed \
         -j$(nproc)
 
       install -D -m 0644 build/${PLAT}/release/bl2.bin ${CRAFT_PART_INSTALL}/blobs/bl2-${MACHINE}.bin
@@ -208,6 +209,7 @@ parts:
       gcc bootparameter.c -o bootparameter
       # Create bl2_bp.bin
       ./bootparameter ${CRAFT_STAGE}/blobs/boot/bl2-${MACHINE}.bin bl2_bp.bin
+
       # build pmic images
       # Create bl2_bp_pmic.bin
       ./bootparameter ${CRAFT_STAGE}/blobs/bl2-${MACHINE}_pmic.bin bl2_bp_pmic.bin
@@ -223,6 +225,9 @@ parts:
 
       # Convert to srec
       objcopy -O srec --adjust-vma=0x00011E00 --srec-forceS3 -I binary bl2_bp_pmic.bin bl2_bp_pmic.srec
+
+      # add tee
+      fiptool update --align 16 --tos-fw ${CRAFT_STAGE}/blobs/tee-${MACHINE}.bin fip_pmic.bin
       objcopy -I binary -O srec --adjust-vma=0x0000 --srec-forceS3 fip_pmic.bin fip_pmic.srec
 
       # Install fip images
