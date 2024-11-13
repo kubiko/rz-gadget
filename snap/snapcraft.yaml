@@ -65,6 +65,43 @@ parts:
     prime:
       - -*
 
+  u-boot:
+    after:
+      - pub-signing-key
+      - flash-script
+    plugin: nil
+    source: https://git.launchpad.net/~ondrak/+git/u-boot
+    source-type: git
+    source-tag: v2023.10/rz-asr
+    source-depth: 1
+    build-environment:
+      - MACHINE: "smarc-rzg2l"
+      - CROSS_COMPILE: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-"
+      - CC: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-gcc"
+    override-build: |
+      # copy in place dtsi with pub part of kernel signing key
+      cp ${CRAFT_STAGE}/u-boot-pubkey.dtsi \
+         ${CRAFT_PART_BUILD}/arch/arm/dts/u-boot-pubkey.dtsi
+      # update mmc_seed_part and mmc_boot_part from flash-uc.sh
+      mmc_seed_part="$(grep mmc_seed_part ${CRAFT_STAGE}/blobs/flash-uc.sh | sed -e 's/^# //')"
+      mmc_boot_part="$(grep mmc_boot_part ${CRAFT_STAGE}/blobs/flash-uc.sh | sed -e 's/^# //')"
+      sed -i \
+         -e 's/mmc_seed_part=\(.*\)\\0"/'"${mmc_seed_part}"'\\0"/g' \
+         -e 's/mmc_boot_part=\(.*\)\\0"/'"${mmc_boot_part}"'\\0"/g' \
+         ${CRAFT_PART_BUILD}/include/configs/smarc-rzg2l.h
+      # Add GIT revision to the local version
+      head=$(git rev-parse --verify --short HEAD 2> /dev/null)
+      version=$(make ubootversion)
+      printf "%s%s%s%s" "-${version}" "-rz" "+g" "${head}" > .scmversion
+      make smarc-rzg2l_defconfig
+      make -j$(nproc)
+      tools/mkenvimage -r -s 4096 -o ${CRAFT_PART_INSTALL}/boot.sel - < /dev/null
+      touch ${CRAFT_PART_INSTALL}/uboot.conf
+      install -D -m 644 u-boot.bin ${CRAFT_PART_INSTALL}/blobs/u-boot.bin
+    prime:
+      - boot.sel
+      - uboot.conf
+
   flash-script: # uuu flash script
     plugin: nil
     override-build: |
