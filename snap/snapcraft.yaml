@@ -102,6 +102,47 @@ parts:
       - boot.sel
       - uboot.conf
 
+  fip-images:
+    after:
+      - arm-trusted-firmware
+      - optee-os
+      - u-boot
+    plugin: nil
+    source-depth: 1
+    build-environment:
+      - MACHINE: "smarc-rzg2l"
+    override-pull: |
+      curl \
+        --silent \
+        --output bootparameter.c \
+        https://raw.githubusercontent.com/renesas-rz/meta-renesas/refs/heads/dunfell/rz/meta-rz-common/recipes-bsp/firmware-pack/bootparameter/bootparameter.c
+    override-build: |
+      gcc bootparameter.c -o bootparameter
+      # Create bl2_bp.bin
+      ./bootparameter ${CRAFT_STAGE}/blobs/boot/bl2-${MACHINE}.bin bl2_bp.bin
+      # build pmic images
+      # Create bl2_bp_pmic.bin
+      ./bootparameter ${CRAFT_STAGE}/blobs/bl2-${MACHINE}_pmic.bin bl2_bp_pmic.bin
+      # Add for eSD boot image
+      cp bl2_bp_pmic.bin bl2_bp_esd_pmic.bin
+
+      cat ${CRAFT_STAGE}/blobs/bl2-${MACHINE}_pmic.bin >> bl2_bp_pmic.bin
+
+      # Create fip.bin
+      fiptool create --align 16 \
+                  --soc-fw ${CRAFT_STAGE}/blobs/bl31-${MACHINE}_pmic.bin \
+                  --nt-fw ${CRAFT_STAGE}/blobs/u-boot.bin fip_pmic.bin
+
+      # Convert to srec
+      objcopy -O srec --adjust-vma=0x00011E00 --srec-forceS3 -I binary bl2_bp_pmic.bin bl2_bp_pmic.srec
+      objcopy -I binary -O srec --adjust-vma=0x0000 --srec-forceS3 fip_pmic.bin fip_pmic.srec
+
+      # Install fip images
+      install -D -m 0644 ${CRAFT_PART_BUILD}/bl2_bp_pmic.srec \
+                         ${CRAFT_PART_INSTALL}/blobs/bl2_bp-${MACHINE}_pmic.srec
+      install -D -m 0644 ${CRAFT_PART_BUILD}/fip_pmic.srec \
+                         ${CRAFT_PART_INSTALL}/blobs/fip-${MACHINE}_pmic.srec
+
   flash-script: # uuu flash script
     plugin: nil
     override-build: |
