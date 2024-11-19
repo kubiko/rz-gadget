@@ -178,6 +178,10 @@ parts:
          -e 's/mmc_seed_part=\(.*\)\\0"/'"${mmc_seed_part}"'\\0"/g' \
          -e 's/mmc_boot_part=\(.*\)\\0"/'"${mmc_boot_part}"'\\0"/g' \
          ${CRAFT_PART_BUILD}/include/configs/smarc-rzg2l.h
+      # enable dangerous mode
+      sed -i \
+         -e 's/#define UC_EXTRA_BOOTARGS.*/#define UC_EXTRA_BOOTARGS "dangerous "/g' \
+         ${CRAFT_PART_BUILD}/include/configs/smarc-rzg2l.h
       # Add GIT revision to the local version
       head=$(git rev-parse --verify --short HEAD 2> /dev/null)
       version=$(make ubootversion)
