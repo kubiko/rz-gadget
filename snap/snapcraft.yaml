@@ -237,8 +237,8 @@ parts:
   fip-images:
     after:
       - arm-trusted-firmware
-      - optee-os
       - u-boot
+      - optee-os
     plugin: nil
     source-depth: 1
     build-environment:
@@ -286,7 +286,13 @@ parts:
     build-environment:
       - MACHINE: "smarc-rzg2l"
       - BOARD: "RZG2L_SMARC_PMIC"
-      - CROSS_COMPILE: "aarch64-linux-gnu-"
+      - CROSS_COMPILE: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}"
+      - CC: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-gcc"
+      - AS: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-as"
+      - LD: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-ld"
+      - AR: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-ar"
+      - OBJDUMP : "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-objdump"
+      - OBJCOPY: "${CRAFT_ARCH_TRIPLET_BUILD_FOR}-objcopy"
     override-build: |
       make BOARD=${BOARD} -j1
       install -m 644 -D AArch64_output/*.mot ${CRAFT_PART_INSTALL}/blobs/Flash_Writer_SCIF_RZG2L_SMARC_DDR4_2GB.mot
@@ -407,12 +413,14 @@ build-packages:
   - libxml2-dev
   - libssl-dev
   - pkgconf
+  - pkg-config
   - python3
   - python3-cryptography
   - python3-pyelftools
   - python3-pycryptodome
   - wget
   - zlib1g-dev
+  - uuid-dev
   - on amd64:
     - gcc-aarch64-linux-gnu
     - uuid-dev:arm64
