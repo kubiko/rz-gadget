@@ -193,6 +193,7 @@ parts:
     source-branch: master
     stage:
       - u-boot-pubkey.dtsi
+      - u-boot-dtb-pubkey.dtsi
     prime:
       - -*
 
@@ -213,6 +214,11 @@ parts:
       # copy in place dtsi with pub part of kernel signing key
       cp -f "${CRAFT_STAGE}/u-boot-pubkey.dtsi" \
             "${CRAFT_PART_BUILD}/arch/arm/dts/u-boot-pubkey.dtsi"
+      # TODO: REPLACE: if this is ODM gadget use true ODM key dtsi
+      # If dtb signing key is not needed, set the same key as u-boot-pubkey
+      cp -f "${CRAFT_STAGE}/u-boot-dtb-pubkey.dtsi" \
+            "${CRAFT_PART_BUILD}/arch/arm/dts/u-boot-dtb-pubkey.dtsi"
+
       # update mmc_seed_part and mmc_boot_part from flash-uc.sh
       mmc_seed_part="$(grep mmc_seed_part "${CRAFT_STAGE}/blobs/flash-uc.sh" | sed -e 's/^# //')"
       mmc_boot_part="$(grep mmc_boot_part "${CRAFT_STAGE}/blobs/flash-uc.sh" | sed -e 's/^# //')"
