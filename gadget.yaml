@@ -4,6 +4,10 @@ volumes:
     schema: gpt
     bootloader: u-boot
     structure:
+      - name: tee-storage
+        filesystem: ext4
+        type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4
+        size: 50M
       - name: ubuntu-seed
         role: system-seed
         filesystem: ext4
