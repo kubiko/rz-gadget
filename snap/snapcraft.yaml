@@ -408,7 +408,9 @@ parts:
       fastboot \${fb_dev} oem run:'setenv fastboot_dev mmc'
 
       # Flashing partitions, use timeout 20s
-      echo "If ubuntu-seed partition does not exist, powercycle the device"
+      echo "If ubuntu-seed, partner or ubuntu-seed  partitions do not exist, powercycle the device"
+      fastboot \${fb_dev} flash partner partner.img
+      fastboot \${fb_dev} flash tee-storage tee-storage.img
       fastboot \${fb_dev} flash ubuntu-seed ubuntu-seed.img
       EOF
       install -D -m 755 flash-uc.sh ${CRAFT_PART_INSTALL}/blobs/flash-uc.sh
