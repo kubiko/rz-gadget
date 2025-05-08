@@ -4,6 +4,9 @@ volumes:
     schema: gpt
     bootloader: u-boot
     structure:
+      - name: u-boot-env
+        type: B3652CC6-0B39-4B22-9496-9AF8C018D12A
+        size: 1M
       - name: partner
         filesystem: ext4
         type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4
