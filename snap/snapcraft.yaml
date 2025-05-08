@@ -3,7 +3,7 @@ summary: Renesas RZ/G2L Evaluation Board
 description: |
  Support files for booting RZ/G2L Evaluation Board
 
-version: 24-1
+version: 24-2
 type: gadget
 
 base: core24
@@ -22,7 +22,7 @@ environment:
 
 apps:
   tee-supplicant:
-    command: usr/sbin/tee-supplicant --fs-parent-path $SNAP_SAVE_DATA/optee-fs --ta-path $SNAP_COMMON/lib/optee_armtz --plugin-path $SNAP_COMMON/usr/lib/tee-supplicant/plugins
+    command: usr/sbin/tee-supplicant --fs-parent-path SNAP_COMMON/tee-storage --ta-path $SNAP_COMMON/lib/optee_armtz --plugin-path $SNAP_COMMON/usr/lib/tee-supplicant/plugins
     daemon: simple
     plugs:
       - network-bind
